@@ -18,6 +18,7 @@ public class EvaluationDataContainer {
     private final Map<String,Object> data = new HashMap<>();
     private static final String EXECUTION_TIMES_KEY = "executionTimes";
     private static final String IM_UPDATE_EVAL_KEY = "imUpdateEval";
+    private static final String CHANGE_STATISTIC_KEY = "changeStatistic";
 
     public static EvaluationDataContainer get() {
         if (globalContainer == null) {
@@ -63,7 +64,7 @@ public class EvaluationDataContainer {
     private String errorMessage = null;
 
 //    private long evaluationTime = System.currentTimeMillis();
-    private ChangeStatistic changeStatistic = new ChangeStatistic();
+    
     private CodeModelCorrectnessEval codeModelCorrectness = new CodeModelCorrectnessEval();
     private CodeModelUpdateEvalData codeModelUpdateEval = null;
     private List<PcmUpdateEvalData> pcmUpdateEvals = new ArrayList<>();
@@ -76,8 +77,9 @@ public class EvaluationDataContainer {
 //    }
     
     public ChangeStatistic resetChangeStatistic() {
-        changeStatistic = new ChangeStatistic();
-        return changeStatistic;
+    	ChangeStatistic value = new ChangeStatistic();
+    	put(CHANGE_STATISTIC_KEY,value);
+    	return value;
     }    
     
     public ImUpdateEvalData resetImUpdateEval() {
@@ -87,7 +89,11 @@ public class EvaluationDataContainer {
     }
 
     public ChangeStatistic getChangeStatistic() {
-        return changeStatistic;
+    	return getOrCreate(
+                CHANGE_STATISTIC_KEY,
+                ChangeStatistic.class,
+                ChangeStatistic::new
+        );
     }
 
     public CodeModelUpdateEvalData getCodeModelUpdateEvalData() {

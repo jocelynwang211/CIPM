@@ -3,6 +3,8 @@ package cipm.consistency.vsum.test.evaluationdata;
 import cipm.consistency.tools.evaluation.data.EvaluationDataContainer;
 import cipm.consistency.tools.evaluation.data.ExecutionTimeData;
 import cipm.consistency.tools.evaluation.data.ImUpdateEvalData;
+import cipm.consistency.tools.evaluation.data.ChangeStatistic;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -26,6 +28,7 @@ public class EvaluationDataContainerTest {
 		assertEquals(123L,second.getChangePropagationTime());
 	}
 	
+	
 	@Test
 	void getImUpdateEvalDataReturnsSameInstance() {
 		EvaluationDataContainer container = new  EvaluationDataContainer();
@@ -43,4 +46,25 @@ public class EvaluationDataContainerTest {
 		assertSame(reset,afterReset);
 	}
 	
+	
+	@Test
+	void getChangeStatisticReturnsSameInstance() {
+		EvaluationDataContainer container = new EvaluationDataContainer();
+
+	    ChangeStatistic first = container.getChangeStatistic();
+	    ChangeStatistic second = container.getChangeStatistic();
+
+	    assertSame(first, second);
+	}
+	@Test
+	void resetChangeStatisticReplacesInstance() {
+	    EvaluationDataContainer container = new EvaluationDataContainer();
+
+	    ChangeStatistic first = container.getChangeStatistic();
+	    ChangeStatistic reset = container.resetChangeStatistic();
+	    ChangeStatistic afterReset = container.getChangeStatistic();
+
+	    assertNotSame(first, reset);
+	    assertSame(reset, afterReset);
+	}
 }
