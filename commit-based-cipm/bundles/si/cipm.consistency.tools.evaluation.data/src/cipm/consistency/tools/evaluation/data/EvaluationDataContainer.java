@@ -19,6 +19,7 @@ public class EvaluationDataContainer {
     private static final String EXECUTION_TIMES_KEY = "executionTimes";
     private static final String IM_UPDATE_EVAL_KEY = "imUpdateEval";
     private static final String CHANGE_STATISTIC_KEY = "changeStatistic";
+    private static final String CODE_MODEL_UPDATE_EVAL_KEY = "codeModelUpdateEval";
 
     public static EvaluationDataContainer get() {
         if (globalContainer == null) {
@@ -66,7 +67,6 @@ public class EvaluationDataContainer {
 //    private long evaluationTime = System.currentTimeMillis();
     
     private CodeModelCorrectnessEval codeModelCorrectness = new CodeModelCorrectnessEval();
-    private CodeModelUpdateEvalData codeModelUpdateEval = null;
     private List<PcmUpdateEvalData> pcmUpdateEvals = new ArrayList<>();
 //    private InstrumentationEvaluationData instrumentationData = new InstrumentationEvaluationData();
     private InstrumentationEvaluationData instrumentationData = null;
@@ -97,10 +97,11 @@ public class EvaluationDataContainer {
     }
 
     public CodeModelUpdateEvalData getCodeModelUpdateEvalData() {
-        if (codeModelUpdateEval == null) {
-            codeModelUpdateEval = new CodeModelUpdateEvalData();
-        }
-        return codeModelUpdateEval;
+        return getOrCreate(
+        		CODE_MODEL_UPDATE_EVAL_KEY,
+        		CodeModelUpdateEvalData.class,
+        		CodeModelUpdateEvalData::new
+        		);
     }
 
     public ImUpdateEvalData getImUpdateEvalData() {

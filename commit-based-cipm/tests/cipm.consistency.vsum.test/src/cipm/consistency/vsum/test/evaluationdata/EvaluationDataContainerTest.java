@@ -4,6 +4,7 @@ import cipm.consistency.tools.evaluation.data.EvaluationDataContainer;
 import cipm.consistency.tools.evaluation.data.ExecutionTimeData;
 import cipm.consistency.tools.evaluation.data.ImUpdateEvalData;
 import cipm.consistency.tools.evaluation.data.ChangeStatistic;
+import cipm.consistency.tools.evaluation.data.CodeModelUpdateEvalData;
 
 import org.junit.jupiter.api.Test;
 
@@ -66,5 +67,13 @@ public class EvaluationDataContainerTest {
 
 	    assertNotSame(first, reset);
 	    assertSame(reset, afterReset);
+	}
+	
+	@Test
+	void getCodeModelUpdateEvalDataReturnsSameInstance() {
+		EvaluationDataContainer container = new EvaluationDataContainer();
+		CodeModelUpdateEvalData first = container.getCodeModelUpdateEvalData();
+	    CodeModelUpdateEvalData second = container.getCodeModelUpdateEvalData();
+	    assertSame(first, second);
 	}
 }
