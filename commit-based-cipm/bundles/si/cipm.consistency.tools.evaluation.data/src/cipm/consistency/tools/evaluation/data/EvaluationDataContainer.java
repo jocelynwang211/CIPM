@@ -17,6 +17,7 @@ public class EvaluationDataContainer {
     private static EvaluationDataContainer globalContainer;
     private final Map<String,Object> data = new HashMap<>();
     private static final String EXECUTION_TIMES_KEY = "executionTimes";
+    private static final String IM_UPDATE_EVAL_KEY = "imUpdateEval";
 
     public static EvaluationDataContainer get() {
         if (globalContainer == null) {
@@ -66,7 +67,6 @@ public class EvaluationDataContainer {
     private CodeModelCorrectnessEval codeModelCorrectness = new CodeModelCorrectnessEval();
     private CodeModelUpdateEvalData codeModelUpdateEval = null;
     private List<PcmUpdateEvalData> pcmUpdateEvals = new ArrayList<>();
-    private ImUpdateEvalData imUpdateEval = null;
 //    private InstrumentationEvaluationData instrumentationData = new InstrumentationEvaluationData();
     private InstrumentationEvaluationData instrumentationData = null;
     
@@ -81,8 +81,9 @@ public class EvaluationDataContainer {
     }    
     
     public ImUpdateEvalData resetImUpdateEval() {
-        imUpdateEval = new ImUpdateEvalData();
-        return imUpdateEval;
+    	ImUpdateEvalData value = new ImUpdateEvalData();
+        put(IM_UPDATE_EVAL_KEY, value);
+        return value;
     }
 
     public ChangeStatistic getChangeStatistic() {
@@ -97,10 +98,11 @@ public class EvaluationDataContainer {
     }
 
     public ImUpdateEvalData getImUpdateEvalData() {
-        if (imUpdateEval == null) {
-            imUpdateEval = new ImUpdateEvalData();
-        }
-        return imUpdateEval;
+        return getOrCreate(
+        		IM_UPDATE_EVAL_KEY,
+                ImUpdateEvalData.class,
+                ImUpdateEvalData::new
+        		);
     }
 
     public InstrumentationEvaluationData getInstrumentationData() {
