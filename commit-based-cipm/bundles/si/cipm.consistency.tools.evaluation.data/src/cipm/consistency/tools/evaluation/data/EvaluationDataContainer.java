@@ -20,6 +20,7 @@ public class EvaluationDataContainer {
     private static final String IM_UPDATE_EVAL_KEY = "imUpdateEval";
     private static final String CHANGE_STATISTIC_KEY = "changeStatistic";
     private static final String CODE_MODEL_UPDATE_EVAL_KEY = "codeModelUpdateEval";
+    private static final String CODE_MODEL_CORRECTNESS_KEY = "codeModelCorrectness";
 
     public static EvaluationDataContainer get() {
         if (globalContainer == null) {
@@ -66,7 +67,7 @@ public class EvaluationDataContainer {
 
 //    private long evaluationTime = System.currentTimeMillis();
     
-    private CodeModelCorrectnessEval codeModelCorrectness = new CodeModelCorrectnessEval();
+    
     private List<PcmUpdateEvalData> pcmUpdateEvals = new ArrayList<>();
 //    private InstrumentationEvaluationData instrumentationData = new InstrumentationEvaluationData();
     private InstrumentationEvaluationData instrumentationData = null;
@@ -137,11 +138,15 @@ public class EvaluationDataContainer {
     }
 
     public CodeModelCorrectnessEval getCodeModelCorrectness() {
-        return codeModelCorrectness;
+    	return getOrCreate(
+                CODE_MODEL_CORRECTNESS_KEY,
+                CodeModelCorrectnessEval.class,
+                CodeModelCorrectnessEval::new
+        );
     }
 
     public void setCodeModelCorrectness(CodeModelCorrectnessEval codeModelCorrectness) {
-        this.codeModelCorrectness = codeModelCorrectness;
+        put(CODE_MODEL_CORRECTNESS_KEY,codeModelCorrectness);
     }
 
     public String getErrorMessage() {
