@@ -2,6 +2,10 @@ package cipm.consistency.tools.evaluation.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import java.util.function.Supplier;
 
 /**
  * Container for the complete data.
@@ -11,6 +15,8 @@ import java.util.List;
  */
 public class EvaluationDataContainer {
     private static EvaluationDataContainer globalContainer;
+    private final Map<String,Object> data = new HashMap<>();
+    private static final String EXECUTION_TIMES_KEY = "executionTimes";
 
     public static EvaluationDataContainer get() {
         if (globalContainer == null) {
@@ -21,6 +27,31 @@ public class EvaluationDataContainer {
 
     public static void set(EvaluationDataContainer newContainer) {
         globalContainer = newContainer;
+    }
+    
+    private void put(String key, Object value) {
+        data.put(key, value);
+    }
+
+    private <T> T get(String key, Class<T> type) {
+        Object value = data.get(key);
+
+        if (value == null) {
+            return null;
+        }
+
+        return type.cast(value);
+    }
+    
+    private <T> T getOrCreate(String key, Class<T> type, Supplier<T> creator) {
+        T value = get(key, type);
+
+        if (value == null) {
+            value = creator.get();
+            put(key, value);
+        }
+
+        return value;
     }
 
     /**
@@ -38,7 +69,7 @@ public class EvaluationDataContainer {
     private ImUpdateEvalData imUpdateEval = null;
 //    private InstrumentationEvaluationData instrumentationData = new InstrumentationEvaluationData();
     private InstrumentationEvaluationData instrumentationData = null;
-    private ExecutionTimeData executionTimes = new ExecutionTimeData();
+    
 
 //    public long getEvaluationTime() {
 //        return evaluationTime;
@@ -77,7 +108,11 @@ public class EvaluationDataContainer {
     }
 
     public ExecutionTimeData getExecutionTimes() {
-        return executionTimes;
+        return getOrCreate(
+        		EXECUTION_TIMES_KEY,
+        		ExecutionTimeData.class,
+        		ExecutionTimeData::new
+        		);
     }
 
     public boolean valid() {
