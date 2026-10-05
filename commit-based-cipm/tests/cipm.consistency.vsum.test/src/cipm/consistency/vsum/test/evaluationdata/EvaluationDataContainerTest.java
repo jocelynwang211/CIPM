@@ -7,17 +7,53 @@ import cipm.consistency.tools.evaluation.data.ChangeStatistic;
 import cipm.consistency.tools.evaluation.data.CodeModelUpdateEvalData;
 import cipm.consistency.tools.evaluation.data.CodeModelCorrectnessEval;
 import cipm.consistency.tools.evaluation.data.LegacyEvaluationDataContainer;
+import cipm.consistency.tools.evaluation.data.EvaluationDataContainerReaderWriter;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class EvaluationDataContainerTest {
+	@TempDir
+    Path tempDir;
+	@Test
+	void readLegacyReadsOldEvaluationDataFile() throws IOException {
+	    String legacyJson = "{"
+	            + "\"validated\":true,"
+	            + "\"evaluationRan\":true,"
+	            + "\"errorMessage\":\"legacy error\","
+	            + "\"executionTimes\":{"
+	            + "\"changePropagationTime\":456"
+	            + "}"
+	            + "}";
+
+	    Path legacyFile = tempDir.resolve("evaluationData.json");
+	    Files.writeString(legacyFile, legacyJson);
+	    LegacyEvaluationDataContainer legacy =
+	            EvaluationDataContainerReaderWriter.readLegacy(legacyFile);
+
+	    assertNotNull(legacy);
+	    assertTrue(legacy.isValidated());
+	    assertTrue(legacy.isEvaluationRan());
+	    assertEquals("legacy error", legacy.getErrorMessage());
+	    assertEquals(
+	            456L,
+	            legacy.getExecutionTimes().getChangePropagationTime()
+	    );
+	}
+	
+	
 	@Test
 	void getExecutionTimesReturnsSameInstance() {
 		EvaluationDataContainer container = new EvaluationDataContainer();
@@ -126,5 +162,5 @@ public class EvaluationDataContainerTest {
 	    assertEquals("test error", container.getErrorMessage());
 	    assertEquals(123L,container.getExecutionTimes().getChangePropagationTime()
 	    );
-	}
+	}	
 }

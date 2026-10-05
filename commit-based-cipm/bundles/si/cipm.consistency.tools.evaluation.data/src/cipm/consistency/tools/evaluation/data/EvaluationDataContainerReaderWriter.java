@@ -31,6 +31,17 @@ public final class EvaluationDataContainerReaderWriter {
             return null;
         }
     }
+    
+    public static LegacyEvaluationDataContainer readLegacy(Path file) {
+        try (BufferedReader reader = Files.newBufferedReader(file)) {
+            return new Gson().fromJson(
+                    reader,
+                    LegacyEvaluationDataContainer.class
+            );
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
     /**
      * Writes the evaluation data to a file.
