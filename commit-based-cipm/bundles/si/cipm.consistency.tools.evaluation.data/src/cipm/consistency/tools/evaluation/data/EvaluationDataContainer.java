@@ -33,6 +33,56 @@ public class EvaluationDataContainer {
         globalContainer = newContainer;
     }
     
+    public static EvaluationDataContainer fromLegacy(
+            LegacyEvaluationDataContainer legacy) {
+
+        EvaluationDataContainer container = new EvaluationDataContainer();
+
+        container.validated = legacy.isValidated();
+        container.evaluationRan = legacy.isEvaluationRan();
+        container.errorMessage = legacy.getErrorMessage();
+
+        if (legacy.getChangeStatistic() != null) {
+            container.put(
+                    CHANGE_STATISTIC_KEY,
+                    legacy.getChangeStatistic()
+            );
+        }
+
+        if (legacy.getCodeModelCorrectness() != null) {
+            container.put(
+                    CODE_MODEL_CORRECTNESS_KEY,
+                    legacy.getCodeModelCorrectness()
+            );
+        }
+
+        if (legacy.getCodeModelUpdateEval() != null) {
+            container.put(
+                    CODE_MODEL_UPDATE_EVAL_KEY,
+                    legacy.getCodeModelUpdateEval()
+            );
+        }
+
+        if (legacy.getImUpdateEval() != null) {
+            container.put(
+                    IM_UPDATE_EVAL_KEY,
+                    legacy.getImUpdateEval()
+            );
+        }
+
+        if (legacy.getExecutionTimes() != null) {
+            container.put(
+                    EXECUTION_TIMES_KEY,
+                    legacy.getExecutionTimes()
+            );
+        }
+
+        container.pcmUpdateEvals = legacy.getPcmUpdateEvals();
+        container.instrumentationData = legacy.getInstrumentationData();
+
+        return container;
+    }
+    
     private void put(String key, Object value) {
         data.put(key, value);
     }

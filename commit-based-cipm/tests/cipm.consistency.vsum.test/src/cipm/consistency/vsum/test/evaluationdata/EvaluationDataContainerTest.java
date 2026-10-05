@@ -6,12 +6,16 @@ import cipm.consistency.tools.evaluation.data.ImUpdateEvalData;
 import cipm.consistency.tools.evaluation.data.ChangeStatistic;
 import cipm.consistency.tools.evaluation.data.CodeModelUpdateEvalData;
 import cipm.consistency.tools.evaluation.data.CodeModelCorrectnessEval;
+import cipm.consistency.tools.evaluation.data.LegacyEvaluationDataContainer;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.google.gson.Gson;
 
 public class EvaluationDataContainerTest {
 	@Test
@@ -96,5 +100,31 @@ public class EvaluationDataContainerTest {
 	    CodeModelCorrectnessEval afterSet = container.getCodeModelCorrectness();
 	    assertNotSame(first, replacement);
 	    assertSame(replacement, afterSet);
+	}
+	
+	
+	@Test
+	void fromLegacyPreservesExistingData() {
+		String legacyJson = "{"
+		            + "\"validated\":true,"
+		            + "\"evaluationRan\":true,"
+		            + "\"errorMessage\":\"test error\","
+		            + "\"executionTimes\":{"
+		            + "\"changePropagationTime\":123"
+		            + "}"
+		            + "}";
+		LegacyEvaluationDataContainer legacy =
+	            new Gson().fromJson(
+	                    legacyJson,
+	                    LegacyEvaluationDataContainer.class
+	            );
+		EvaluationDataContainer container =
+	            EvaluationDataContainer.fromLegacy(legacy);
+
+	    assertTrue(container.valid());
+	    assertTrue(container.isEvaluationRan());
+	    assertEquals("test error", container.getErrorMessage());
+	    assertEquals(123L,container.getExecutionTimes().getChangePropagationTime()
+	    );
 	}
 }
