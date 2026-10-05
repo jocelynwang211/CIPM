@@ -42,6 +42,14 @@ public final class EvaluationDataContainerReaderWriter {
             return null;
         }
     }
+    public static EvaluationDataContainer readLegacyAndConvert(Path file) {
+        LegacyEvaluationDataContainer legacy = readLegacy(file);
+        if (legacy == null) {
+            return null;
+        }
+        return EvaluationDataContainer.fromLegacy(legacy);
+    }
+    
 
     /**
      * Writes the evaluation data to a file.

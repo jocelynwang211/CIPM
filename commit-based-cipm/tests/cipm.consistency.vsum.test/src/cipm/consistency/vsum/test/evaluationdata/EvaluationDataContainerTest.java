@@ -162,5 +162,27 @@ public class EvaluationDataContainerTest {
 	    assertEquals("test error", container.getErrorMessage());
 	    assertEquals(123L,container.getExecutionTimes().getChangePropagationTime()
 	    );
-	}	
+	}
+	
+	@Test
+	void readLegacyAndConvertPreservesExistingData()throws IOException {
+		String legacyJson = "{"
+	            + "\"validated\":true,"
+	            + "\"evaluationRan\":true,"
+	            + "\"errorMessage\":\"converted error\","
+	            + "\"executionTimes\":{"
+	            + "\"changePropagationTime\":789"
+	            + "}"
+	            + "}";
+		Path legacyFile = tempDir.resolve("evaluationData.json");
+	    Files.writeString(legacyFile, legacyJson);
+	    EvaluationDataContainer container =
+	            EvaluationDataContainerReaderWriter.readLegacyAndConvert(legacyFile);
+	    
+	    assertNotNull(container);
+	    assertTrue(container.valid());
+	    assertTrue(container.isEvaluationRan());
+	    assertEquals("converted error",container.getErrorMessage());
+	    assertEquals(789L,container.getExecutionTimes().getChangePropagationTime());
+	}
 }
