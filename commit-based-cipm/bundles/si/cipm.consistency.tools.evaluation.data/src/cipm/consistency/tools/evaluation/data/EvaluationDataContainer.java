@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.lang.reflect.Type;
+
+import com.google.gson.reflect.TypeToken;
 
 import java.util.function.Supplier;
 
@@ -16,12 +19,28 @@ import java.util.function.Supplier;
 public class EvaluationDataContainer {
     private static EvaluationDataContainer globalContainer;
     private final Map<String,Object> data = new HashMap<>();
+    private static final Map<String,Type> TYPE_REGISTRY = new HashMap<>();
+    
     private static final String EXECUTION_TIMES_KEY = "executionTimes";
     private static final String IM_UPDATE_EVAL_KEY = "imUpdateEval";
     private static final String CHANGE_STATISTIC_KEY = "changeStatistic";
     private static final String CODE_MODEL_UPDATE_EVAL_KEY = "codeModelUpdateEval";
     private static final String CODE_MODEL_CORRECTNESS_KEY = "codeModelCorrectness";
-
+    private static final String PCM_UPDATE_EVALS_KEY = "pcmUpdateEvals";
+    private static final Type PCM_UPDATE_EVALS_TYPE =
+    		new TypeToken<List<PcmUpdateEvalData>>() {}.getType();
+    private static final String INSTRUMENTATION_DATA_KEY = "instrumentationData";
+    static {
+    	TYPE_REGISTRY.put(EXECUTION_TIMES_KEY, ExecutionTimeData.class);
+        TYPE_REGISTRY.put(IM_UPDATE_EVAL_KEY, ImUpdateEvalData.class);
+        TYPE_REGISTRY.put(CHANGE_STATISTIC_KEY, ChangeStatistic.class);
+        TYPE_REGISTRY.put(CODE_MODEL_UPDATE_EVAL_KEY,CodeModelUpdateEvalData.class);
+        TYPE_REGISTRY.put(CODE_MODEL_CORRECTNESS_KEY,CodeModelCorrectnessEval.class);
+        TYPE_REGISTRY.put(PCM_UPDATE_EVALS_KEY,PCM_UPDATE_EVALS_TYPE);
+        TYPE_REGISTRY.put(INSTRUMENTATION_DATA_KEY,InstrumentationEvaluationData.class);
+    }
+    		
+    		
     public static EvaluationDataContainer get() {
         if (globalContainer == null) {
             globalContainer = new EvaluationDataContainer();
@@ -77,11 +96,22 @@ public class EvaluationDataContainer {
             );
         }
 
-        container.pcmUpdateEvals = legacy.getPcmUpdateEvals();
-        container.instrumentationData = legacy.getInstrumentationData();
+        if (legacy.getPcmUpdateEvals()!=null) {
+        	container.put(
+        			PCM_UPDATE_EVALS_KEY,
+                    legacy.getPcmUpdateEvals()
+        	);
+        }
+        if (legacy.getInstrumentationData()!=null) {
+        	container.put(
+        			INSTRUMENTATION_DATA_KEY,
+                    legacy.getInstrumentationData()
+        	);
+        }
 
         return container;
     }
+    
     
     private void put(String key, Object value) {
         data.put(key, value);
@@ -118,9 +148,7 @@ public class EvaluationDataContainer {
 //    private long evaluationTime = System.currentTimeMillis();
     
     
-    private List<PcmUpdateEvalData> pcmUpdateEvals = new ArrayList<>();
 //    private InstrumentationEvaluationData instrumentationData = new InstrumentationEvaluationData();
-    private InstrumentationEvaluationData instrumentationData = null;
     
 
 //    public long getEvaluationTime() {
@@ -164,7 +192,11 @@ public class EvaluationDataContainer {
     }
 
     public InstrumentationEvaluationData getInstrumentationData() {
-        return instrumentationData;
+        return getOrCreate(
+        		INSTRUMENTATION_DATA_KEY,
+                InstrumentationEvaluationData.class,
+                InstrumentationEvaluationData::new
+        );
     }
 
     public ExecutionTimeData getExecutionTimes() {
@@ -183,8 +215,15 @@ public class EvaluationDataContainer {
         this.validated = success;
     }
 
+    @SuppressWarnings("unchecked")
     public List<PcmUpdateEvalData> getPcmUpdateEvals() {
-        return pcmUpdateEvals;
+    	List<PcmUpdateEvalData> value = (List<PcmUpdateEvalData>)data.get(PCM_UPDATE_EVALS_KEY);
+    	
+    	if(value==null) {
+    		value = new ArrayList<>();
+    		put(PCM_UPDATE_EVALS_KEY,value);
+    	}
+    	return value;
     }
 
     public CodeModelCorrectnessEval getCodeModelCorrectness() {

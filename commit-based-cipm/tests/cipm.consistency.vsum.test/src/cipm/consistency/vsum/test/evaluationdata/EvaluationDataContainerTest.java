@@ -8,6 +8,8 @@ import cipm.consistency.tools.evaluation.data.CodeModelUpdateEvalData;
 import cipm.consistency.tools.evaluation.data.CodeModelCorrectnessEval;
 import cipm.consistency.tools.evaluation.data.LegacyEvaluationDataContainer;
 import cipm.consistency.tools.evaluation.data.EvaluationDataContainerReaderWriter;
+import cipm.consistency.tools.evaluation.data.PcmUpdateEvalData;
+import cipm.consistency.tools.evaluation.data.InstrumentationEvaluationData;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -23,6 +25,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class EvaluationDataContainerTest {
 	@TempDir
@@ -185,4 +188,34 @@ public class EvaluationDataContainerTest {
 	    assertEquals("converted error",container.getErrorMessage());
 	    assertEquals(789L,container.getExecutionTimes().getChangePropagationTime());
 	}
+	
+	@Test
+	void getPcmUpdateEvalsReturnsSameInstanceAndKeepsValues() {
+		EvaluationDataContainer container = new EvaluationDataContainer();
+
+	    List<PcmUpdateEvalData> first = container.getPcmUpdateEvals();
+
+	    PcmUpdateEvalData item = new PcmUpdateEvalData();
+	    first.add(item);
+
+	    List<PcmUpdateEvalData> second = container.getPcmUpdateEvals();
+
+	    assertSame(first, second);
+	    assertEquals(1, second.size());
+	    assertSame(item, second.get(0));
+	}
+	
+	@Test
+	void getInstrumentationDataReturnsSameInstance() {
+	    EvaluationDataContainer container = new EvaluationDataContainer();
+
+	    InstrumentationEvaluationData first =
+	            container.getInstrumentationData();
+	    InstrumentationEvaluationData second =
+	            container.getInstrumentationData();
+
+	    assertNotNull(first);
+	    assertSame(first, second);
+	}
+	
 }
