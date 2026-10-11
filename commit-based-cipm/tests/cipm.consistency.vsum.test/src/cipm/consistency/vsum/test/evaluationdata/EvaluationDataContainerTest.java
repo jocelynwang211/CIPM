@@ -218,4 +218,100 @@ public class EvaluationDataContainerTest {
 	    assertSame(first, second);
 	}
 	
+	@Test
+	void readNewRestoresRegisteredDataTypes() throws IOException {
+	    String newJson = "{"
+	            + "\"validated\":true,"
+	            + "\"evaluationRan\":true,"
+	            + "\"errorMessage\":\"new format error\","
+	            + "\"data\":{"
+	            + "\"executionTimes\":{"
+	            + "\"changePropagationTime\":123"
+	            + "},"
+	            + "\"pcmUpdateEvals\":[{}]"
+	            + "}"
+	            + "}";
+
+	    Path newFile = tempDir.resolve("evaluation-new.json");
+	    Files.writeString(newFile, newJson);
+
+	    EvaluationDataContainer container =
+	            EvaluationDataContainerReaderWriter.readNew(newFile);
+
+	    assertNotNull(container);
+	    assertTrue(container.valid());
+	    assertTrue(container.isEvaluationRan());
+	    assertEquals(
+	            "new format error",
+	            container.getErrorMessage()
+	    );
+
+	    assertEquals(
+	            123L,
+	            container.getExecutionTimes().getChangePropagationTime()
+	    );
+
+	    assertEquals(1, container.getPcmUpdateEvals().size());
+
+	    Object pcmUpdateEval =
+	            container.getPcmUpdateEvals().get(0);
+
+	    assertTrue(pcmUpdateEval instanceof PcmUpdateEvalData);
+	}
+	@Test
+	void writeAndReadNewPreservesData() throws IOException {
+	    EvaluationDataContainer original =
+	            new EvaluationDataContainer();
+
+	    original.setSuccessful(true);
+	    original.setEvaluationRan(true);
+	    original.setErrorMessage("round trip error");
+
+	    original.getExecutionTimes()
+	            .setChangePropagationTime(321L);
+
+	    PcmUpdateEvalData pcmUpdateEval =
+	            new PcmUpdateEvalData();
+
+	    original.getPcmUpdateEvals().add(pcmUpdateEval);
+
+	    Path newFile =
+	            tempDir.resolve("evaluation-new.json");
+
+	    EvaluationDataContainerReaderWriter.writeNew(
+	            original,
+	            newFile
+	    );
+
+	    EvaluationDataContainer restored =
+	            EvaluationDataContainerReaderWriter.readNew(
+	                    newFile
+	            );
+
+	    assertNotNull(restored);
+	    assertTrue(restored.valid());
+	    assertTrue(restored.isEvaluationRan());
+
+	    assertEquals(
+	            "round trip error",
+	            restored.getErrorMessage()
+	    );
+
+	    assertEquals(
+	            321L,
+	            restored.getExecutionTimes()
+	                    .getChangePropagationTime()
+	    );
+
+	    assertEquals(
+	            1,
+	            restored.getPcmUpdateEvals().size()
+	    );
+
+	    assertTrue(
+	            restored.getPcmUpdateEvals().get(0)
+	                    instanceof PcmUpdateEvalData
+	    );
+	}
+	
 }

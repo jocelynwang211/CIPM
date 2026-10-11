@@ -113,8 +113,12 @@ public class EvaluationDataContainer {
     }
     
     
-    private void put(String key, Object value) {
+    void put(String key, Object value) {
         data.put(key, value);
+    }
+    
+    static Type getRegisteredType(String key) {
+    	return TYPE_REGISTRY.get(key);
     }
 
     private <T> T get(String key, Class<T> type) {
